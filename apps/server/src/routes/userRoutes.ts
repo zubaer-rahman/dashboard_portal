@@ -4,14 +4,17 @@ import {
   loginUser,
   getUser,
   getUsers,
-} from "../controllers/userController";
+  deleteUser,
+ } from "../controllers/userController";
 import authMiddleware from "../middlewares/authMiddleware";
 
 const router = Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+
 router.get("/:email", authMiddleware, getUser);
 router.get("/", authMiddleware, getUsers);
+router.delete("/:id", authMiddleware, deleteUser);
 
 export default router;

@@ -16,8 +16,9 @@ const createUser = async (
 const getUserByEmail = async (email: string): Promise<IUser | null> => {
   return User.findOne({ email });
 };
-const getAllUser = async (): Promise<IUser[]> => {
-  return User.find();
+
+const getAllUser = async (id: any): Promise<IUser[]> => {
+  return User.find({ _id: { $ne: id } });
 };
 
 const generateToken = (user: IUser): string => {
@@ -30,4 +31,4 @@ const generateToken = (user: IUser): string => {
   );
 };
 
-export { createUser, getUserByEmail, generateToken, getAllUser};
+export { createUser, getUserByEmail, generateToken, getAllUser };
