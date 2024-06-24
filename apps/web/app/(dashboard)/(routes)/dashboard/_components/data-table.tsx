@@ -22,16 +22,18 @@ import {
   TableRow,
 } from "@repo/ui/components/ui/table";
 import { Button } from "@repo/ui/components/ui/button";
-import { PlusCircle } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  rowSelection: {};
+  setRowSelection: React.Dispatch<React.SetStateAction<{}>>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  setRowSelection,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -51,15 +53,14 @@ export function DataTable<TData, TValue>({
       sorting,
       columnFilters,
     },
+    enableRowSelection: true,
   });
+  console.log(
+    table.getSelectedRowModel().rows.map((item:any) => item.original._id)
+  );
 
   return (
-    <div>
-      <div className="flex justify-end mb-4 ">
-        <Button className="flex items-center text-slate-700 font-medium border border-slate-300 py-1">
-          <PlusCircle className="mr-2 h-4 w-4" /> New
-        </Button>
-      </div>
+    <>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -128,6 +129,6 @@ export function DataTable<TData, TValue>({
           Next
         </Button>
       </div>
-    </div>
+    </>
   );
 }

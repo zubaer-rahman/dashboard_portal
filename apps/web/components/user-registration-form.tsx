@@ -3,7 +3,7 @@ import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -14,6 +14,8 @@ interface FormData {
 }
 export const UserRegistrationForm: React.FC = () => {
   const router = useRouter();
+  const pathname = usePathname();
+
   const [formData, setFormData] = useState<FormData>({
     username: "",
     email: "",
@@ -34,7 +36,12 @@ export const UserRegistrationForm: React.FC = () => {
         formData
       );
       const { user } = response.data;
-      if (user) toast.success("Registered user sucessfully");
+      if (user)
+        toast.success(
+          pathname.includes("sign-up")
+            ? "Registered user sucessfully"
+            : "Created user successfully"
+        );
       router.push("/login");
     } catch (err) {
       console.error("", err);
@@ -82,7 +89,7 @@ export const UserRegistrationForm: React.FC = () => {
           type="submit"
           className="w-full bg-black text-white"
         >
-          Register
+          {pathname.includes("sign-up") ? "Register" : "Create"}
         </Button>
       </div>
     </form>

@@ -5,8 +5,9 @@ import { columns } from "./_components/columns";
 import { DataTable } from "./_components/data-table";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { CreateUserModal } from "./_components/create-user-modal";
 
-interface User {
+export interface User {
   _id: string;
   username: string;
   email: string;
@@ -17,6 +18,7 @@ interface User {
 const DashBoardPage = () => {
   const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
+  const [rowSelection, setRowSelection] = useState({});
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -50,7 +52,13 @@ const DashBoardPage = () => {
 
   return (
     <div className="p-6">
-      <DataTable columns={columns} data={users} />
+      <CreateUserModal />
+      <DataTable
+        columns={columns}
+        data={users}
+        rowSelection={rowSelection}
+        setRowSelection={setRowSelection}
+      />
     </div>
   );
 };
