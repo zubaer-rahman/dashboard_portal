@@ -1,5 +1,4 @@
 "use client";
-import * as React from "react";
 
 import {
   ColumnDef,
@@ -22,23 +21,21 @@ import {
   TableRow,
 } from "@repo/ui/components/ui/table";
 import { Button } from "@repo/ui/components/ui/button";
+import { useEffect, useState } from "react";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  rowSelection: {};
-  setRowSelection: React.Dispatch<React.SetStateAction<{}>>;
+  setSelectedRows: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  setRowSelection,
+  setSelectedRows,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
   const table = useReactTable({
     data,
@@ -55,10 +52,11 @@ export function DataTable<TData, TValue>({
     },
     enableRowSelection: true,
   });
-  console.log(
-    table.getSelectedRowModel().rows.map((item:any) => item.original._id)
-  );
-
+  useEffect(() => {
+    setSelectedRows(
+      table.getSelectedRowModel().rows.map((item: any) => item.original._id)
+    );
+  }, [table.getSelectedRowModel().rows.length]);
   return (
     <>
       <div className="rounded-md border">

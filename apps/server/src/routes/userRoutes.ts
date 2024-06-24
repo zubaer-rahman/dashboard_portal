@@ -5,7 +5,8 @@ import {
   getUser,
   getUsers,
   deleteUser,
- } from "../controllers/userController";
+  deleteSelectedUsers,
+} from "../controllers/userController";
 import authMiddleware from "../middlewares/authMiddleware";
 
 const router = Router();
@@ -16,5 +17,6 @@ router.post("/login", loginUser);
 router.get("/:email", authMiddleware, getUser);
 router.get("/", authMiddleware, getUsers);
 router.delete("/:id", authMiddleware, deleteUser);
+router.delete("/", authMiddleware, deleteSelectedUsers);
 
 export default router;

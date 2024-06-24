@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
+import mongoose from "mongoose";
+
 import {
   createUser,
   getUserByEmail,
@@ -16,7 +18,7 @@ const registerUser = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "User already exists" });
     }
     const user = await createUser(username, email, password);
-    res.status(201).json({ user, token: generateToken(user)});
+    res.status(201).json({ user, token: generateToken(user) });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -54,7 +56,7 @@ const getUser = async (req: Request, res: Response) => {
   }
 };
 const getUsers = async (req: Request, res: Response) => {
-  const {id} = req.query;  
+  const { id } = req.query;
   try {
     const users = await getAllUser(id);
     res.status(200).json(users);
@@ -74,5 +76,31 @@ const deleteUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+const deleteSelectedUsers = async (req: Request, res: Response) => {
+  const { selectedRows } = req.body;
+  try {
+    const objectIds = selectedRows.map((id:string)=> {
+      if(mongoose.isValidObjectId(id)){
+        return new mongoose.Types.ObjectId(id)
+      }
+    });
 
-export { registerUser, loginUser, getUser, getUsers, deleteUser };
+
+    const deletedUsers = await User.deleteMany({ _id: { $in: objectIds } });
+    if (!deletedUsers) res.status(404).json({ message: "Users not found" });
+    res
+      .status(200)
+      .json({ message: "Users deleted successfully", user: deletedUsers });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
+export {
+  registerUser,
+  loginUser,
+  getUser,
+  getUsers,
+  deleteUser,
+  deleteSelectedUsers,
+};
