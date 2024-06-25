@@ -22,6 +22,8 @@ import {
 } from "@repo/ui/components/ui/table";
 import { Button } from "@repo/ui/components/ui/button";
 import { useEffect, useState } from "react";
+import { Input } from "@repo/ui/components/ui/input";
+import { FilterStatus } from "./filter-status";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -57,9 +59,30 @@ export function DataTable<TData, TValue>({
       table.getSelectedRowModel().rows.map((item: any) => item.original._id)
     );
   }, [table.getSelectedRowModel().rows.length]);
+
+  const handleStatusChange = (value: string) => {
+    table
+      .getColumn("status")
+      ?.setFilterValue(
+        value === "active" ? true : value === "all" ? undefined : false
+      );
+  };
   return (
     <>
-      <div className="rounded-md border">
+      <div className="flex space-x-2">
+        <Input
+          placeholder="Filter users..."
+          value={
+            (table.getColumn("username")?.getFilterValue() as string) ?? ""
+          }
+          onChange={(event) =>
+            table.getColumn("username")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+        <FilterStatus handleStatusChange={handleStatusChange} />
+      </div>
+      <div className="rounded-md border mt-4">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

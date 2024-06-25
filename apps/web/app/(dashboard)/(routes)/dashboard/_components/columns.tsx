@@ -2,18 +2,20 @@
 
 import { Badge } from "@repo/ui/components/ui/badge";
 import { Button } from "@repo/ui/components/ui/button";
- import { ColumnDef } from "@tanstack/react-table";
+import { ColumnDef } from "@tanstack/react-table";
 import axios from "axios";
 import { ArrowUpDown, Trash } from "lucide-react";
 import React from "react";
 import toast from "react-hot-toast";
 import { IndeterminateCheckbox } from "./indeterminate-checkbox";
+import { cn } from "@repo/ui/lib/utils";
 
 type User = {
   _id: string;
   username: string;
   email: string;
   password: string;
+  status: boolean;
   __v: number;
 };
 const handleDelete = async (id: String) => {
@@ -36,6 +38,31 @@ const handleDelete = async (id: String) => {
     console.error("Error deleting user: ", err);
   }
 };
+const handleStatusUpdate = async (id: string, status: boolean) => {
+  const token = localStorage.getItem("token");
+
+  try {
+    const response = await axios.patch(
+      `http://localhost:5000/api/users/${id}`,
+      {
+        status,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    const { message } = response.data;
+    if (message) {
+      toast.success("Updated user status successfully");
+      history.go(0);
+    }
+  } catch (err) {
+    console.error("Error updating user status: ", err);
+  }
+};
+
 export const columns: ColumnDef<User>[] = [
   {
     id: "select",
@@ -108,11 +135,18 @@ export const columns: ColumnDef<User>[] = [
         </Button>
       );
     },
-    cell: (prop) => {
-      const value = prop.getValue();
+    cell: ({ row }) => {
+      const { status, _id } = row.original;
       return (
-        <Badge variant="outline" className="text-white bg-slate-700">
-          {value ? "Active" : "Inactive"}
+        <Badge
+          onClick={() => handleStatusUpdate(_id, !status)}
+          variant="outline"
+          className={cn(
+            "text-white bg-slate-700 cursor-pointer",
+            status && "bg-green-400"
+          )}
+        >
+          {status ? "Active" : "Inactive"}
         </Badge>
       );
     },

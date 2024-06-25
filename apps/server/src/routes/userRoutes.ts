@@ -6,6 +6,7 @@ import {
   getUsers,
   deleteUser,
   deleteSelectedUsers,
+  updateUser,
 } from "../controllers/userController";
 import authMiddleware from "../middlewares/authMiddleware";
 
@@ -17,6 +18,7 @@ router.post("/login", loginUser);
 router.get("/:email", authMiddleware, getUser);
 router.get("/", authMiddleware, getUsers);
 router.delete("/:id", authMiddleware, deleteUser);
+router.patch("/:id", authMiddleware, updateUser);
 router.delete("/", authMiddleware, deleteSelectedUsers);
 
 export default router;

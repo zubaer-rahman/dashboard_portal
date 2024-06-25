@@ -1,4 +1,7 @@
 "use client";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import axios from "axios";
 import {
   Card,
   CardHeader,
@@ -9,9 +12,6 @@ import {
 import { Label } from "@repo/ui/components/ui/label";
 import { Input } from "@repo/ui/components/ui/input";
 import { Button } from "@repo/ui/components/ui/button";
-import React, { useEffect, useState } from "react";
-import Link from "next/link";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 
 interface FormData {
@@ -25,30 +25,36 @@ const LoginPage: React.FC = () => {
     email: "",
     password: "",
   });
+  const [error, setError] = useState<string | null>(null); // State to hold error message
+
   useEffect(() => {
     localStorage.getItem("token") && router.push("/dashboard");
   }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      console.log(formData);
-
       const response = await axios.post<{ token: string; user: object }>(
         "http://localhost:5000/api/users/login",
         formData
-      ); // Assuming your login API endpoint is /api/login
+      );
 
       const { token, user } = response.data;
-      console.log(token, user);
-
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
       router.push("/dashboard");
     } catch (error) {
-      console.error("Login failed", error);
+      if (axios.isAxiosError(error)) {
+        setError(
+          error.response?.data.message || "An unexpected error occurred"
+        );
+      } else {
+        setError("An unexpected error occurred");
+      }
     }
   };
 
@@ -86,6 +92,7 @@ const LoginPage: React.FC = () => {
                 required
               />
             </div>
+            {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
             <Button
               variant="ghost"
               type="submit"
@@ -97,7 +104,7 @@ const LoginPage: React.FC = () => {
         </form>
       </CardContent>
       <div className="text-center mt-2">
-        <p className="text-grey-dark text-sm">
+        <p className="text-gray-600 text-sm">
           Don't have an account?{" "}
           <Link href="/sign-up" className="no-underline text-blue font-bold">
             Sign up
@@ -108,4 +115,5 @@ const LoginPage: React.FC = () => {
     </Card>
   );
 };
+
 export default LoginPage;

@@ -8,12 +8,14 @@ import axios from "axios";
 import { CreateUserModal } from "./_components/create-user-modal";
 import { Button } from "@repo/ui/components/ui/button";
 import { Trash } from "lucide-react";
+import toast from "react-hot-toast";
 
 export interface User {
   _id: string;
   username: string;
   email: string;
   password: string;
+  status: boolean;
   __v: number;
 }
 
@@ -50,13 +52,31 @@ const DashBoardPage = () => {
 
     checkAuth();
   }, [router]);
-
+  const handleDeleteRows = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.delete("http://localhost:5000/api/users/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          selectedRows,
+        },
+      });
+      const { message } = response.data;
+      if (message) {
+        toast.success(message);
+        history.go(0);
+      }
+    } catch (err) {
+      console.error("Error! deleting rows", err);
+    }
+  };
   return (
-    <div className="p-6">
-      <div className="flex justify-end space-x-2 mb-4">
+    <div className="p-6 relative">
+      <div className="absolute flex right-6 space-x-2">
         <Button
-        onClick={() => console.log(selectedRows)
-        }
+          onClick={handleDeleteRows}
           disabled={!selectedRows.length}
           variant="outline"
           className="flex items-center text-slate-700 font-medium  py-1"

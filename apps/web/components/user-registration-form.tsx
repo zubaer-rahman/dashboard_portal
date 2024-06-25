@@ -1,10 +1,9 @@
-"use client";
+import { useState } from "react";
+import axios, { AxiosError } from "axios";
+import { useRouter, usePathname } from "next/navigation";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-import axios from "axios";
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
 import toast from "react-hot-toast";
 
 interface FormData {
@@ -12,6 +11,7 @@ interface FormData {
   email: string;
   password: string;
 }
+
 export const UserRegistrationForm: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
@@ -22,12 +22,15 @@ export const UserRegistrationForm: React.FC = () => {
     password: "",
   });
 
+  const [error, setError] = useState<string>("");
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -36,22 +39,38 @@ export const UserRegistrationForm: React.FC = () => {
         formData
       );
       const { user } = response.data;
-      if (user)
+      if (user) {
         toast.success(
           pathname.includes("sign-up")
-            ? "Registered user sucessfully"
+            ? "Registered user successfully"
             : "Created user successfully"
         );
-      router.push("/login");
+        router.push("/login");
+      }
     } catch (err) {
-      console.error("", err);
+      handleApiError(err);
     }
   };
+
+  const handleApiError = (err: AxiosError) => {
+    if (err.response) {
+      // Server responded with a status code outside of 2xx range
+      const { status, data } = err.response;
+      setError(`Error ${status}: ${data.message}`);
+    } else if (err.request) {
+      // The request was made but no response was received
+      setError("Network error. Please try again later.");
+    } else {
+      // Something happened in setting up the request that triggered an error
+      setError("Unexpected error. Please try again.");
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="email">User Name</Label>
+          <Label htmlFor="username">Username</Label>
           <Input
             name="username"
             className="px-2"
@@ -91,6 +110,7 @@ export const UserRegistrationForm: React.FC = () => {
         >
           {pathname.includes("sign-up") ? "Register" : "Create"}
         </Button>
+        {error && <p className="text-red-500">{error}</p>}
       </div>
     </form>
   );

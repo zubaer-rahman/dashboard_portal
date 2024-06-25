@@ -9,6 +9,7 @@ import {
   getAllUser,
 } from "../services/userService";
 import User from "../models/userModel";
+import { log } from "winston";
 
 const registerUser = async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
@@ -76,21 +77,41 @@ const deleteUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+const updateUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  console.log({...req.body});
+  
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { ...req.body },
+      { new: true }
+    );
+    if (!updatedUser) res.status(404).json({ message: "User not found" });
+    res
+      .status(200)
+      .json({ message: "User updated successfully", user: updatedUser });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};
 const deleteSelectedUsers = async (req: Request, res: Response) => {
   const { selectedRows } = req.body;
   try {
-    const objectIds = selectedRows.map((id:string)=> {
-      if(mongoose.isValidObjectId(id)){
-        return new mongoose.Types.ObjectId(id)
+    const objectIds = selectedRows.map((id: string) => {
+      if (mongoose.isValidObjectId(id)) {
+        return new mongoose.Types.ObjectId(id);
       }
     });
 
-
     const deletedUsers = await User.deleteMany({ _id: { $in: objectIds } });
-    if (!deletedUsers) res.status(404).json({ message: "Users not found" });
-    res
-      .status(200)
-      .json({ message: "Users deleted successfully", user: deletedUsers });
+
+    if (!deletedUsers.deletedCount)
+      res.status(404).json({ message: "Users not found" });
+    else
+      res
+        .status(200)
+        .json({ message: "Users deleted successfully", user: deletedUsers });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -103,4 +124,5 @@ export {
   getUsers,
   deleteUser,
   deleteSelectedUsers,
+  updateUser,
 };

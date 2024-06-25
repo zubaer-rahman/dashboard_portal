@@ -1,10 +1,7 @@
-import { redirect } from 'next/navigation'
+import { redirect } from "next/navigation";
 
 const RootPage = () => {
-//    return redirect("/login")
-return <div>
-    Home page
-</div>
-}
+  return redirect("/login");
+};
 
-export default RootPage
+export default RootPage;
