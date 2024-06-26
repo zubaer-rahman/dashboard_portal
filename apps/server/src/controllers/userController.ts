@@ -9,8 +9,7 @@ import {
   getAllUser,
 } from "../services/userService";
 import User from "../models/userModel";
-import { log } from "winston";
-
+ 
 const registerUser = async (req: Request, res: Response) => {
   const { username, email, password } = req.body;
   try {
@@ -57,9 +56,9 @@ const getUser = async (req: Request, res: Response) => {
   }
 };
 const getUsers = async (req: Request, res: Response) => {
-  const { id } = req.query;
+  const { id, page, pageSize, search, status } = req.query;
   try {
-    const users = await getAllUser(id);
+    const users = await getAllUser(id, page, pageSize, search, status);
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
@@ -79,8 +78,8 @@ const deleteUser = async (req: Request, res: Response) => {
 };
 const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  console.log({...req.body});
-  
+  console.log({ ...req.body });
+
   try {
     const updatedUser = await User.findByIdAndUpdate(
       id,

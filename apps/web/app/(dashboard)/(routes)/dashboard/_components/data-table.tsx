@@ -3,11 +3,12 @@
 import {
   ColumnDef,
   ColumnFiltersState,
+  OnChangeFn,
+  PaginationState,
   SortingState,
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
@@ -29,12 +30,24 @@ interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   setSelectedRows: React.Dispatch<React.SetStateAction<string[]>>;
+  pagination: PaginationState;
+  setPagination: OnChangeFn<PaginationState>;
+  totalCount: number;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
+  search: string;
+  setStatus: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
   setSelectedRows,
+  pagination,
+  setPagination,
+  totalCount,
+  setSearch,
+  search,
+  setStatus,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -43,7 +56,7 @@ export function DataTable<TData, TValue>({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onColumnFiltersChange: setColumnFilters,
@@ -51,7 +64,10 @@ export function DataTable<TData, TValue>({
     state: {
       sorting,
       columnFilters,
+      pagination,
     },
+    manualPagination: true,
+    pageCount: Math.ceil(totalCount / pagination.pageSize),
     enableRowSelection: true,
   });
   useEffect(() => {
@@ -61,23 +77,15 @@ export function DataTable<TData, TValue>({
   }, [table.getSelectedRowModel().rows.length]);
 
   const handleStatusChange = (value: string) => {
-    table
-      .getColumn("status")
-      ?.setFilterValue(
-        value === "active" ? true : value === "all" ? undefined : false
-      );
+    setStatus(value === "active" ? "true" : value === "all" ? "all" : "false");
   };
   return (
     <>
       <div className="flex space-x-2">
         <Input
           placeholder="Filter users..."
-          value={
-            (table.getColumn("username")?.getFilterValue() as string) ?? ""
-          }
-          onChange={(event) =>
-            table.getColumn("username")?.setFilterValue(event.target.value)
-          }
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
           className="max-w-sm"
         />
         <FilterStatus handleStatusChange={handleStatusChange} />
@@ -133,6 +141,7 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
+        <p>{`${pagination.pageIndex + 1} / ${Math.ceil(totalCount / pagination.pageSize)}`}</p>
         <Button
           variant="outline"
           size="sm"

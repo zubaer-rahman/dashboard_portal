@@ -1,10 +1,10 @@
+"use client";
 import { useState } from "react";
-import axios, { AxiosError } from "axios";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Button } from "@repo/ui/components/ui/button";
 import { Input } from "@repo/ui/components/ui/input";
 import { Label } from "@repo/ui/components/ui/label";
-import toast from "react-hot-toast";
+import useCreateUser from "../app/hooks/useCreateUser";
 
 interface FormData {
   username: string;
@@ -13,7 +13,6 @@ interface FormData {
 }
 
 export const UserRegistrationForm: React.FC = () => {
-  const router = useRouter();
   const pathname = usePathname();
 
   const [formData, setFormData] = useState<FormData>({
@@ -24,6 +23,8 @@ export const UserRegistrationForm: React.FC = () => {
 
   const [error, setError] = useState<string>("");
 
+  const mutation = useCreateUser(setError);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -33,37 +34,7 @@ export const UserRegistrationForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      const response = await axios.post<{ token: string; user: object }>(
-        "http://localhost:5000/api/users/register",
-        formData
-      );
-      const { user } = response.data;
-      if (user) {
-        toast.success(
-          pathname.includes("sign-up")
-            ? "Registered user successfully"
-            : "Created user successfully"
-        );
-        router.push("/login");
-      }
-    } catch (err) {
-      handleApiError(err);
-    }
-  };
-
-  const handleApiError = (err: AxiosError) => {
-    if (err.response) {
-      // Server responded with a status code outside of 2xx range
-      const { status, data } = err.response;
-      setError(`Error ${status}: ${data.message}`);
-    } else if (err.request) {
-      // The request was made but no response was received
-      setError("Network error. Please try again later.");
-    } else {
-      // Something happened in setting up the request that triggered an error
-      setError("Unexpected error. Please try again.");
-    }
+    await mutation.mutateAsync(formData);
   };
 
   return (

@@ -17,8 +17,35 @@ const getUserByEmail = async (email: string): Promise<IUser | null> => {
   return User.findOne({ email });
 };
 
-const getAllUser = async (id: any): Promise<IUser[]> => {
-  return User.find({ _id: { $ne: id } });
+const getAllUser = async (
+  id: any,
+  page: any,
+  pageSize: any,
+  search: any,
+  status: any
+): Promise<object> => {
+  const filters: any = {};
+
+  if (id) {
+    filters._id = { $ne: id };
+  }
+  if (search) {
+    filters.$or = [
+      { name: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } },
+    ];
+  }
+  if (status !== "all") {
+    filters.status = status;
+  }
+  console.log(filters);
+
+  const users = await User.find(filters)
+    .skip((page - 1) * pageSize)
+    .limit(pageSize);
+  const total = await User.countDocuments(filters);
+
+  return { users, total: total };
 };
 
 const generateToken = (user: IUser): string => {
