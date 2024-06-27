@@ -9,6 +9,8 @@ import React from "react";
 import toast from "react-hot-toast";
 import { IndeterminateCheckbox } from "./indeterminate-checkbox";
 import { cn } from "@repo/ui/lib/utils";
+import useUpdateUser from "../../../../hooks/useUpdateUser";
+import useDeleteUser from "../../../../hooks/useDeleteUser";
 
 type User = {
   _id: string;
@@ -36,30 +38,6 @@ const handleDelete = async (id: String) => {
     }
   } catch (err) {
     console.error("Error deleting user: ", err);
-  }
-};
-const handleStatusUpdate = async (id: string, status: boolean) => {
-  const token = localStorage.getItem("token");
-
-  try {
-    const response = await axios.patch(
-      `http://localhost:5000/api/users/${id}`,
-      {
-        status,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    const { message } = response.data;
-    if (message) {
-      toast.success("Updated user status successfully");
-      history.go(0);
-    }
-  } catch (err) {
-    console.error("Error updating user status: ", err);
   }
 };
 
@@ -137,9 +115,11 @@ export const columns: ColumnDef<User>[] = [
     },
     cell: ({ row }) => {
       const { status, _id } = row.original;
+      const payload = { status: !status };
+      const updateUser = useUpdateUser(_id);
       return (
         <Badge
-          onClick={() => handleStatusUpdate(_id, !status)}
+          onClick={() => updateUser.mutateAsync(payload)}
           variant="outline"
           className={cn(
             "text-white bg-slate-700 cursor-pointer",
@@ -155,9 +135,10 @@ export const columns: ColumnDef<User>[] = [
     id: "actions",
     cell: ({ row }) => {
       const { _id } = row.original;
+      const deleteUser = useDeleteUser(_id);
       return (
         <Trash
-          onClick={() => handleDelete(_id)}
+          onClick={() => deleteUser.mutateAsync()}
           className="h-4 w-4 mr-2 cursor-pointer"
         />
       );
