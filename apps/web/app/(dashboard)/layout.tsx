@@ -10,18 +10,12 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
-
+  const token = localStorage.getItem("token");
   useEffect(() => {
     if (!token) {
       router.push("/login");
     }
   }, [token, router]);
-
-  if (!token) {
-    return null;
-  }
 
   return (
     <div>
