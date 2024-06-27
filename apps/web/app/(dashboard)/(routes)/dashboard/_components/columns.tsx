@@ -3,10 +3,8 @@
 import { Badge } from "@repo/ui/components/ui/badge";
 import { Button } from "@repo/ui/components/ui/button";
 import { ColumnDef } from "@tanstack/react-table";
-import axios from "axios";
 import { ArrowUpDown, Trash } from "lucide-react";
 import React from "react";
-import toast from "react-hot-toast";
 import { IndeterminateCheckbox } from "./indeterminate-checkbox";
 import { cn } from "@repo/ui/lib/utils";
 import useUpdateUser from "../../../../hooks/useUpdateUser";
@@ -19,26 +17,6 @@ type User = {
   password: string;
   status: boolean;
   __v: number;
-};
-const handleDelete = async (id: String) => {
-  const token = localStorage.getItem("token");
-  try {
-    const response = await axios.delete(
-      `http://localhost:5000/api/users/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    const { message } = response.data;
-    if (message) {
-      toast.success("Deleted user successfully");
-      history.go(0);
-    }
-  } catch (err) {
-    console.error("Error deleting user: ", err);
-  }
 };
 
 export const columns: ColumnDef<User>[] = [
