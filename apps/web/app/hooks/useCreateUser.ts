@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 const useCreateUser = (setError: any) => {
   const pathname = usePathname();
+  const isSignUpPage = pathname.includes("sign-up");
   const router = useRouter();
 
   const handleError = (err: AxiosError<any>) => {
@@ -22,19 +23,17 @@ const useCreateUser = (setError: any) => {
       setError("Unexpected error. Please try again.");
     }
   };
-  
 
   const mutation = useMutation({
     mutationFn: async (formData: object) => {
-      const response = await axios.post<{ token: string; user: object }>(
+      await axios.post<{ token: string; user: object }>(
         "http://localhost:5000/api/users/register",
         formData
       );
-      return response.data;
     },
     onSuccess: () => {
       toast.success(
-        pathname.includes("sign-up")
+        isSignUpPage
           ? "Registered user successfully"
           : "Created user successfully"
       );
@@ -44,7 +43,6 @@ const useCreateUser = (setError: any) => {
       handleError(err);
     },
   });
-
   return mutation;
 };
 

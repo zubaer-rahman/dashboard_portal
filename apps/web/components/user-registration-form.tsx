@@ -23,18 +23,20 @@ export const UserRegistrationForm: React.FC = () => {
 
   const [error, setError] = useState<string>("");
 
-  const mutation = useCreateUser(setError);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
   };
-
+  const mutation = useCreateUser(setError);
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await mutation.mutateAsync(formData);
+    try{
+      await mutation.mutateAsync(formData);
+    }catch(err){
+      console.log(err)
+    }
   };
 
   return (
