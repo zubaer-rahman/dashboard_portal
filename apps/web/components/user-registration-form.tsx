@@ -14,6 +14,7 @@ interface FormData {
 
 export const UserRegistrationForm: React.FC = () => {
   const pathname = usePathname();
+  const isSignUpPage = pathname.includes("sign-up");
 
   const [formData, setFormData] = useState<FormData>({
     username: "",
@@ -29,13 +30,25 @@ export const UserRegistrationForm: React.FC = () => {
       [e.target.name]: e.target.value,
     });
   };
-  const mutation = useCreateUser(setError);
+  const mutation = useCreateUser();
+
+  const onError = (err: any) => {
+    const {
+      data: { message },
+      status,
+    } = err.response;
+    setError(`Error (${status}): ${message}`);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try{
-      await mutation.mutateAsync(formData);
-    }catch(err){
-      console.log(err)
+    try {
+      await mutation.mutateAsync(formData, { onError });
+    } catch (err) {
+      console.log(
+        `Error ${isSignUpPage ? "Registering" : "Creating"} user:`,
+        err
+      );
     }
   };
 
@@ -81,7 +94,7 @@ export const UserRegistrationForm: React.FC = () => {
           type="submit"
           className="w-full bg-black text-white"
         >
-          {pathname.includes("sign-up") ? "Register" : "Create"}
+          {isSignUpPage ? "Register" : "Create"}
         </Button>
         {error && <p className="text-red-500">{error}</p>}
       </div>
