@@ -1,8 +1,8 @@
 "use client";
-import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import NavBar from "./_components/navbar";
 import Sidebar from "./_components/sidebar";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function DashboardLayout({
   children,
@@ -10,12 +10,20 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
-  const token = localStorage.getItem("token");
+  const [token, setToken] = useState<string | null>(null);
+
   useEffect(() => {
-    if (!token) {
+    const storedToken = localStorage.getItem("token");
+    if (!storedToken) {
       router.push("/login");
+    } else {
+      setToken(storedToken);
     }
-  }, [token, router]);
+  }, [router]);
+
+  if (token === null) {
+    return null;
+  }
 
   return (
     <div>

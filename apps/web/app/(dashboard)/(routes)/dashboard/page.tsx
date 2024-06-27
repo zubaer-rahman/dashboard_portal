@@ -8,7 +8,7 @@ import { PaginationState } from "@tanstack/react-table";
 import { columns } from "./_components/columns";
 import { useFetchUsers, User } from "../../../hooks/useFetchUsers";
 import useDeleteRows from "../../../hooks/useDeleteRows";
-
+ 
 const DashBoardPage = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [search, setSearch] = useState<string>("");
