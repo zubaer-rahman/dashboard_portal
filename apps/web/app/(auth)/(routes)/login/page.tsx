@@ -25,7 +25,7 @@ const LoginPage: React.FC = () => {
     email: "",
     password: "",
   });
-  const [error, setError] = useState<string | null>(null); // State to hold error message
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,7 +41,7 @@ const LoginPage: React.FC = () => {
 
       const { token, user } = response.data;
       localStorage.setItem("token", token);
-      console.log({token})
+      console.log({ token, user });
       localStorage.setItem("user", JSON.stringify(user));
       router.push("/dashboard");
     } catch (error) {

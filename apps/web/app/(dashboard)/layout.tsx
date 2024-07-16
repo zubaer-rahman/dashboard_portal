@@ -1,24 +1,17 @@
 "use client";
-import { useRouter } from "next/navigation";
 import NavBar from "./_components/navbar";
 import Sidebar from "./_components/sidebar";
 import { useEffect, useState } from "react";
-import { isTokenExpired } from "../../utils/token-checker";
 
 export default function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
-    if (!storedToken || isTokenExpired(storedToken)) {
-      router.push("/login");
-    } else {
-      setToken(storedToken);
-    }
+    setToken(storedToken);
   }, []);
 
   if (token === null) {
