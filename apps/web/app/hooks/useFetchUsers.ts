@@ -1,6 +1,7 @@
 import { useQuery, UseQueryOptions, QueryKey } from "@tanstack/react-query";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { isTokenExpired } from "../../utils/token-checker";
 
 export interface User {
   _id: string;
@@ -55,6 +56,9 @@ export function useFetchUsers(
 
   const queryFn = async () => {
     try {
+      if (isTokenExpired(token)) {
+        router.push("/login");
+      }
       return await fetchUsers({ token, user, pagination, search, status });
     } catch (error) {
       console.error("Error fetching users:", error);

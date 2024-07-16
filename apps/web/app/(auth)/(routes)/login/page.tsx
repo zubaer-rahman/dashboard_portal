@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import {
@@ -27,10 +27,6 @@ const LoginPage: React.FC = () => {
   });
   const [error, setError] = useState<string | null>(null); // State to hold error message
 
-  useEffect(() => {
-    localStorage.getItem("token") && router.push("/dashboard");
-  }, []);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -45,6 +41,7 @@ const LoginPage: React.FC = () => {
 
       const { token, user } = response.data;
       localStorage.setItem("token", token);
+      console.log({token})
       localStorage.setItem("user", JSON.stringify(user));
       router.push("/dashboard");
     } catch (error) {

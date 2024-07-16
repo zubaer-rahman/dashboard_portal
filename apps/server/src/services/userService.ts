@@ -53,7 +53,7 @@ const generateToken = (user: IUser): string => {
     { id: user._id, email: user.email },
     process.env.JWT_SECRET!,
     {
-      expiresIn: "1h",
+      expiresIn: "5s",
     }
   );
 };

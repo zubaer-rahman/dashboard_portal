@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import User from "../models/userModel";
-interface CustomRequest extends Request {
+ interface CustomRequest extends Request {
   user?: any; // Define the user property
 }
 

@@ -8,9 +8,9 @@ import { PaginationState } from "@tanstack/react-table";
 import { columns } from "./_components/columns";
 import { useFetchUsers, User } from "../../../hooks/useFetchUsers";
 import useDeleteRows from "../../../hooks/useDeleteRows";
- 
+  
 const DashBoardPage = () => {
-  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [search, setSearch] = useState<string>("");
   const [status, setStatus] = useState<string>("all");
   const [pagination, setPagination] = useState<PaginationState>({
@@ -24,17 +24,17 @@ const DashBoardPage = () => {
   const user = localStorage.getItem("user") || "";
 
   const { data } = useFetchUsers(token, user, pagination, search, status);
-  const mutation = useDeleteRows(token);
+  const deleteRows = useDeleteRows(token);
 
   useEffect(() => {
-    if (data) {
+     if (data) {
       setUsers(data.users || []);
       setTotalCount(data.total || 0);
     }
   }, [data]);
 
   const handleDeleteRows = async () => {
-    await mutation.mutateAsync(selectedRows);
+    await deleteRows.mutateAsync(selectedRows);
   };
 
   return (
